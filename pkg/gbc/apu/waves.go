@@ -2,7 +2,8 @@ package apu
 
 import (
 	"math"
-	"math/rand"
+
+	"github.com/pokemium/worldwide/pkg/gbc/framecountertime"
 )
 
 // WaveGenerator is a function which can be used for generating waveform
@@ -37,7 +38,7 @@ func Noise() WaveGenerator {
 	return func(t float64) byte {
 		if t-last > twoPi {
 			last = t
-			val = byte(rand.Intn(2)) * 0xFF // TODO: BIG FLAG, use frameCounterTime.now() % 2
+			val = byte(framecountertime.UnixNow % 2) * 0xFF
 		}
 		return val
 	}

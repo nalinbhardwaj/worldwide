@@ -8,6 +8,7 @@ import (
 
 	"github.com/pokemium/worldwide/pkg/gbc/apu"
 	"github.com/pokemium/worldwide/pkg/gbc/cart"
+	"github.com/pokemium/worldwide/pkg/gbc/framecountertime"
 	"github.com/pokemium/worldwide/pkg/gbc/joypad"
 	"github.com/pokemium/worldwide/pkg/gbc/rtc"
 	"github.com/pokemium/worldwide/pkg/gbc/scheduler"
@@ -262,6 +263,7 @@ func (g *GBC) Update() {
 	if frame%3 == 0 {
 		g.handleJoypad()
 	}
+	framecountertime.UpdateTicker(frame)
 
 	for frame == g.Video.FrameCounter {
 		g.Step()

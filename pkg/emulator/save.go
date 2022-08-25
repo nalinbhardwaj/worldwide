@@ -1,6 +1,7 @@
 package emulator
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -54,6 +55,8 @@ func (e *Emulator) writeSav() {
 		}
 	}
 
+	fmt.Printf("savdata buffer: %x\n", buffer)
+
 	_, err = savfile.Write(buffer)
 	if err != nil {
 		return
@@ -67,6 +70,7 @@ func (e *Emulator) loadSav() {
 	if err != nil {
 		return
 	}
+	fmt.Printf("savdata: %x\n", savdata)
 
 	switch e.GBC.Cartridge.RAMSize {
 	case cart.RAM_UNUSED:

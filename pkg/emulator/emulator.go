@@ -6,19 +6,15 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/pokemium/worldwide/pkg/emulator/audio"
 	"github.com/pokemium/worldwide/pkg/emulator/joypad"
 	"github.com/pokemium/worldwide/pkg/gbc"
+	"github.com/pokemium/worldwide/pkg/gbc/framecountertime"
 )
 
-// TODO: Make a frameCounterTime subpackage, give it a second ticker function
-// that increments the channel every 60th frame recieved. Similarly, base a time.now()
-// equivalent function on that, set it to the ticker (as offset) + some fixed value.
 var (
-	second = time.NewTicker(time.Second)
 	cache  []byte
 )
 
@@ -83,7 +79,7 @@ func (e *Emulator) Update() error {
 	audio.Play()
 
 	select {
-	case <-second.C:
+	case <-framecountertime.Ticker:
 		e.GBC.RTC.IncrementSecond()
 		ebiten.SetWindowTitle(fmt.Sprintf("%dfps", int(ebiten.CurrentTPS())))
 	default:
