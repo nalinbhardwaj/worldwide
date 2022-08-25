@@ -37,7 +37,7 @@ func Noise() WaveGenerator {
 	return func(t float64) byte {
 		if t-last > twoPi {
 			last = t
-			val = byte(rand.Intn(2)) * 0xFF // TODO: BIG FLAG
+			val = byte(rand.Intn(2)) * 0xFF // TODO: BIG FLAG, use frameCounterTime.now() % 2
 		}
 		return val
 	}

@@ -34,7 +34,7 @@ type Channel struct {
 	onL bool
 	onR bool
 	// Debug flag to turn off sound output
-	// TODO: check more carefully if this is needed but probably removable
+	// TODO: check more carefully if this is needed, leave as is
 	debugOff bool
 }
 

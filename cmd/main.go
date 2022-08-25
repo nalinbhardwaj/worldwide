@@ -64,7 +64,7 @@ func Run() int {
 	cur, _ := os.Getwd()
 
 	romDir := filepath.Dir(romPath)
-	romData, err := readROM(romPath)
+	romData, err := readROM(romPath) // TODO: This becomes part of input state in MIPS and gets hashed
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ROM Error: %s\n", err)
 		return ExitCodeError

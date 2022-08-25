@@ -310,7 +310,7 @@ func (a *APU) WriteWaveform(offset byte, value byte) {
 }
 
 // ToggleSoundChannel toggles a sound channel for debugging.
-// TODO: look more carefully at this, but probably deletable?
+// TODO: look more carefully at this, but 100% deletable?
 func (a *APU) ToggleSoundChannel(channel int) {
 	switch channel {
 	case 1:

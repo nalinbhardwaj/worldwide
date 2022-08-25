@@ -15,8 +15,11 @@ import (
 	"github.com/pokemium/worldwide/pkg/gbc"
 )
 
+// TODO: Make a frameCounterTime subpackage, give it a second ticker function
+// that increments the channel every 60th frame recieved. Similarly, base a time.now()
+// equivalent function on that, set it to the ticker (as offset) + some fixed value.
 var (
-	second = time.NewTicker(time.Second) // TODO: BIG FLAG?
+	second = time.NewTicker(time.Second)
 	cache  []byte
 )
 

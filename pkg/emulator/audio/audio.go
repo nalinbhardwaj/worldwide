@@ -1,4 +1,4 @@
-// TODO: delete audio stuff
+// TODO: delete audio stuff, only from MIPS
 
 package audio
 
