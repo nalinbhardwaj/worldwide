@@ -10,7 +10,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/pokemium/worldwide/pkg/emulator/audio"
-	"github.com/pokemium/worldwide/pkg/emulator/debug"
 	"github.com/pokemium/worldwide/pkg/emulator/joypad"
 	"github.com/pokemium/worldwide/pkg/gbc"
 )
@@ -27,7 +26,6 @@ type Emulator struct {
 	GBC      *gbc.GBC
 	Rom      []byte
 	RomDir   string
-	debugger *debug.Debugger // TODO: can just delete this??
 	pause    bool
 	reset    bool
 	quit     bool
@@ -46,7 +44,6 @@ func New(romData []byte, romDir string) *Emulator {
 		Rom:    romData,
 		RomDir: romDir,
 	}
-	e.debugger = debug.New(g, &e.pause)
 	e.setupCloseHandler()
 
 	e.loadSav()
@@ -60,7 +57,6 @@ func (e *Emulator) ResetGBC() {
 	e.GBC = gbc.New(e.Rom, joypad.Handler, audio.SetStream)
 	e.GBC.Callbacks = oldCallbacks
 
-	e.debugger.Reset(e.GBC)
 	e.loadSav()
 
 	e.reset = false

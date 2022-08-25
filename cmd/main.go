@@ -50,7 +50,6 @@ func main() {
 func Run() int {
 	var (
 		showVersion = flag.Bool("v", false, "show version")
-		port        = flag.Int("p", 0, "HTTP server port (>1023)")
 	)
 
 	flag.Parse()
@@ -71,14 +70,6 @@ func Run() int {
 	}
 
 	emu := emulator.New(romData, romDir)
-	// TODO: just delete from both versions to minimize complexity, git history looks very independent
-	if *port > 0 {
-		if *port < 1024 {
-			fmt.Fprintf(os.Stderr, "Server Error: cannot use well-known port for server")
-		} else {
-			go emu.RunServer(*port)
-		}
-	}
 
 	os.Chdir(cur)
 	defer func() {

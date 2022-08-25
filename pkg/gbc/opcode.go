@@ -221,7 +221,7 @@ func stop(g *GBC, _, _ int) {
 	} else {
 		sleep := ^(g.loadIO(JOYPIO) & 0x30)
 		if sleep > 0 {
-			fmt.Println("TODO: impl sleep on stop") // TODO: FLAG? It's good it doesnt actually sleep?
+			fmt.Println("TODO: impl sleep on stop")
 		}
 	}
 }

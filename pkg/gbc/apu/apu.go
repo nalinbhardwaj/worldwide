@@ -4,7 +4,6 @@ package apu
 
 import (
 	"fmt"
-	"log"
 	"math"
 
 	"github.com/pokemium/worldwide/pkg/util"
@@ -307,22 +306,6 @@ func (a *APU) WriteWaveform(offset byte, value byte) {
 	soundIndex := (offset - 0x30) * 2
 	a.waveformRAM[soundIndex] = (value >> 4) & 0xF * 0x11
 	a.waveformRAM[soundIndex+1] = value & 0xF * 0x11
-}
-
-// ToggleSoundChannel toggles a sound channel for debugging.
-// TODO: look more carefully at this, but 100% deletable?
-func (a *APU) ToggleSoundChannel(channel int) {
-	switch channel {
-	case 1:
-		a.chn1.debugOff = !a.chn1.debugOff
-	case 2:
-		a.chn2.debugOff = !a.chn2.debugOff
-	case 3:
-		a.chn3.debugOff = !a.chn3.debugOff
-	case 4:
-		a.chn4.debugOff = !a.chn4.debugOff
-	}
-	log.Printf("Toggle Channel %v mute", channel)
 }
 
 func (a *APU) LogSoundState() {
