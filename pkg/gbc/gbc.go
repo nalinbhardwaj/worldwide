@@ -281,7 +281,7 @@ func (g *GBC) PanicHandler(place string, stack bool) {
 	if err := recover(); err != nil {
 		fmt.Fprintf(os.Stderr, "%s emulation error: %s in 0x%04x\n", place, err, g.Reg.PC)
 		for depth := 0; ; depth++ {
-			_, file, line, ok := runtime.Caller(depth)
+			_, file, line, ok := runtime.Caller(depth) // TODO: FLAG, easy to comment out
 			if !ok {
 				break
 			}

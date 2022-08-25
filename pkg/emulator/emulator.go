@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	second = time.NewTicker(time.Second)
+	second = time.NewTicker(time.Second) // TODO: BIG FLAG?
 	cache  []byte
 )
 
@@ -24,7 +24,7 @@ type Emulator struct {
 	GBC      *gbc.GBC
 	Rom      []byte
 	RomDir   string
-	debugger *debug.Debugger
+	debugger *debug.Debugger // TODO: can just delete this??
 	pause    bool
 	reset    bool
 	quit     bool
@@ -112,7 +112,7 @@ func (e *Emulator) Exit() {
 	e.writeSav()
 }
 
-func (e *Emulator) setupCloseHandler() {
+func (e *Emulator) setupCloseHandler() { // TODO: BIG FLAG, need to delete this from MIPS
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {

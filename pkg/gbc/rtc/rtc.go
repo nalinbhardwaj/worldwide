@@ -121,7 +121,7 @@ func (rtc *RTC) Dump() []byte {
 	latch := rtc.LatchedRTC
 	result[20], result[24], result[28], result[32], result[36] = latch.Ctr[S], latch.Ctr[M], latch.Ctr[H], latch.Ctr[DL], latch.Ctr[DH]
 
-	now := time.Now().Unix()
+	now := time.Now().Unix() // TODO: BIG FLAG
 	result[40], result[41], result[42], result[43] = byte(now), byte(now>>8), byte(now>>16), byte(now>>24)
 	return result
 }
@@ -136,7 +136,7 @@ func (rtc *RTC) Sync(value []byte) {
 	rtc.LatchedRTC.Ctr = [5]byte{value[20], value[24], value[28], value[32], value[36]}
 
 	savTime := (uint32(value[43]) << 24) | (uint32(value[42]) << 16) | (uint32(value[41]) << 8) | uint32(value[40])
-	delta := uint32(time.Now().Unix()) - savTime
+	delta := uint32(time.Now().Unix()) - savTime // TODO: BIG FLAG
 	for i := uint32(0); i < delta; i++ {
 		rtc.incrementSecond()
 	}

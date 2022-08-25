@@ -21,7 +21,7 @@ func btnStart() bool {
 }
 
 func btnSelect() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyBackspace)
+	return ebiten.IsKeyPressed(ebiten.KeyShift)
 }
 
 func keyUp() bool {

@@ -9,9 +9,9 @@ import (
 
 // GameBoy save data is SRAM core dump
 func (e *Emulator) writeSav() {
-	savname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".sav")
+	savname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".sav") // TODO: Change file name?
 
-	savfile, err := os.Create(savname)
+	savfile, err := os.Create(savname) // TODO: FLAG, change for embedded MIPS to output hash
 	if err != nil {
 		return
 	}
@@ -63,7 +63,7 @@ func (e *Emulator) writeSav() {
 func (e *Emulator) loadSav() {
 	savname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".sav")
 
-	savdata, err := os.ReadFile(savname)
+	savdata, err := os.ReadFile(savname) // TODO: FLAG, change for embedded MIPS to input hash, preimage etc
 	if err != nil {
 		return
 	}

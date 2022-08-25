@@ -1,3 +1,6 @@
+# TODO: this seems deletable in its entirety?
+# Maybe this is needed in the non-MIPS version though for Twitch Plays Pokemon down the line?
+# Debug stuff def not though i think
 # Server
 
 `worldwide` contains an HTTP server, and the user can give various instructions to it through HTTP requests.

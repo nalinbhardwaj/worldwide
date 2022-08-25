@@ -1,3 +1,4 @@
+// TODO: FLAG, this should no longer be entry point for MIPS
 package main
 
 import (
@@ -70,6 +71,7 @@ func Run() int {
 	}
 
 	emu := emulator.New(romData, romDir)
+	// TODO: just delete from both versions to minimize complexity, git history looks very independent
 	if *port > 0 {
 		if *port < 1024 {
 			fmt.Fprintf(os.Stderr, "Server Error: cannot use well-known port for server")
