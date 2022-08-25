@@ -1,6 +1,7 @@
 package emulator
 
 import (
+	"encoding/gob"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -59,8 +60,19 @@ func (e *Emulator) writeSav() {
 
 	_, err = savfile.Write(buffer)
 	if err != nil {
-		return
+		panic(err)
 	}
+
+	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
+
+	inpfile, err := os.Create(inpname) // TODO: FLAG, change for embedded MIPS to output hash
+	if err != nil {
+		panic(err)
+	}
+	defer inpfile.Close()
+
+	encoder := gob.NewEncoder(inpfile)
+	encoder.Encode(e.GBC.PressedInputs)
 }
 
 func (e *Emulator) loadSav() {

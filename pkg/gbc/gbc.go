@@ -70,6 +70,11 @@ type CurInst struct {
 	PC     uint16
 }
 
+type FrameInput struct {
+	Pressed bool
+	HandlerOutput []bool
+}
+
 // GBC core structure
 type GBC struct {
 	Reg  Register
@@ -99,6 +104,9 @@ type GBC struct {
 
 	// plugins
 	Callbacks []*util.Callback
+
+	// saved update inputs
+	PressedInputs []FrameInput
 }
 
 // TransferROM Transfer ROM from cartridge to Memory
@@ -214,6 +222,7 @@ func New(romData []byte, j [8](func() bool), setAudioStream func([]byte)) *GBC {
 		joypad:    joypad.New(j),
 		RTC:       rtc.New(c.HasRTC()),
 		Sound:     apu.New(true, setAudioStream),
+		PressedInputs: make([]FrameInput, 0),
 	}
 
 	// init graphics
@@ -261,7 +270,7 @@ func (g *GBC) Step() {
 func (g *GBC) Update() {
 	frame := g.Frame()
 	if frame%3 == 0 {
-		g.handleJoypad()
+		g.handleJoypad(frame)
 	}
 	framecountertime.UpdateTicker(frame)
 
@@ -325,8 +334,13 @@ func (g *GBC) updateIRQs() {
 
 func (g *GBC) Draw() []byte { return g.Video.Display().Pix }
 
-func (g *GBC) handleJoypad() {
-	pressed := g.joypad.Input()
+func (g *GBC) handleJoypad(frame int) {
+	pressed, handlerOutputs := g.joypad.Input()
+	frameInp := FrameInput{
+		Pressed: pressed,
+		HandlerOutput: handlerOutputs,
+	}
+	g.PressedInputs = append(g.PressedInputs, frameInp)
 	if pressed {
 		g.IO[IFIO] = util.SetBit8(g.IO[IFIO], 4, true)
 		g.updateIRQs()

@@ -1,6 +1,8 @@
 package joypad
 
-import "github.com/pokemium/worldwide/pkg/util"
+import (
+	"github.com/pokemium/worldwide/pkg/util"
+)
 
 const (
 	A      = 0
@@ -43,12 +45,14 @@ func (pad *Joypad) Output() byte {
 }
 
 // Input joypad
-func (j *Joypad) Input() bool {
+func (j *Joypad) Input() (bool, []bool) {
 	pressed := false
+	handlerOutputs := make([]bool, 8)
 
 	// A,B,Start,Select
 	for i := 0; i < 4; i++ {
-		if j.handler[i]() {
+		handlerOutputs[i] = j.handler[i]()
+		if handlerOutputs[i] {
 			old := j.button[i]
 			j.button[i] = true
 			if !old && j.button[i] {
@@ -61,7 +65,8 @@ func (j *Joypad) Input() bool {
 
 	// Right, Left, Up, Down
 	for i := 0; i < 4; i++ {
-		if j.handler[i+4]() {
+		handlerOutputs[i+4] = j.handler[i+4]()
+		if handlerOutputs[i+4] {
 			old := j.direction[i]
 			j.direction[i] = true
 			if !old && j.direction[i] {
@@ -72,5 +77,5 @@ func (j *Joypad) Input() bool {
 		}
 	}
 
-	return pressed
+	return pressed, handlerOutputs
 }
