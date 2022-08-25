@@ -72,7 +72,9 @@ func (e *Emulator) writeSav() {
 	defer inpfile.Close()
 
 	encoder := gob.NewEncoder(inpfile)
-	encoder.Encode(e.GBC.PressedInputs)
+	e.GBC.Inp.ExitFrame = e.GBC.Frame()
+	fmt.Printf("exit frame: %d\n", e.GBC.Inp.ExitFrame)
+	encoder.Encode(e.GBC.Inp)
 }
 
 func (e *Emulator) loadSav() {

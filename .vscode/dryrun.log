@@ -1,5 +1,5 @@
 make --dry-run --always-make --keep-going --print-directory
 make: Entering directory `/Users/nibnalin/Documents/worldwide'
-go build -tags macos -o ./build/darwin-amd64/worldwide -ldflags "-X 'main.version=v0.2.0-1-g12d1dda'" ./cmd/
+go build -tags macos -o ./build/darwin-amd64/worldwide -ldflags "-X 'main.version=v0.2.0-6-gae35fe6'" ./cmd/
 make: Leaving directory `/Users/nibnalin/Documents/worldwide'
  

@@ -75,6 +75,18 @@ type FrameInput struct {
 	HandlerOutput []bool
 }
 
+type Inputs struct {
+	ExitFrame int
+	PressedInputs []FrameInput
+}
+
+func NewInp() *Inputs {
+	return &Inputs{
+		ExitFrame: -1,
+		PressedInputs: make([]FrameInput, 0),
+	}
+}
+
 // GBC core structure
 type GBC struct {
 	Reg  Register
@@ -106,7 +118,7 @@ type GBC struct {
 	Callbacks []*util.Callback
 
 	// saved update inputs
-	PressedInputs []FrameInput
+	Inp *Inputs
 }
 
 // TransferROM Transfer ROM from cartridge to Memory
@@ -222,7 +234,7 @@ func New(romData []byte, j [8](func() bool), setAudioStream func([]byte)) *GBC {
 		joypad:    joypad.New(j),
 		RTC:       rtc.New(c.HasRTC()),
 		Sound:     apu.New(true, setAudioStream),
-		PressedInputs: make([]FrameInput, 0),
+		Inp:  		 NewInp(),
 	}
 
 	// init graphics
@@ -340,7 +352,7 @@ func (g *GBC) handleJoypad(frame int) {
 		Pressed: pressed,
 		HandlerOutput: handlerOutputs,
 	}
-	g.PressedInputs = append(g.PressedInputs, frameInp)
+	g.Inp.PressedInputs = append(g.Inp.PressedInputs, frameInp)
 	if pressed {
 		g.IO[IFIO] = util.SetBit8(g.IO[IFIO], 4, true)
 		g.updateIRQs()

@@ -10,7 +10,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target `all'.  Stop.
 
 
-# Make data base, printed on Wed Aug 24 22:48:50 2022
+# Make data base, printed on Thu Aug 25 15:43:36 2022
 
 # Variables
 
@@ -65,7 +65,7 @@ VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # makefile (from `makefile', line 31)
 TEST3 = mooneye-gb/call_cc_timing/
 # makefile (from `makefile', line 3)
-VERSION := v0.2.0-1-g12d1dda
+VERSION := v0.2.0-6-gae35fe6
 # makefile (from `makefile', line 47)
 TEST19 = mooneye-gb/if_ie_registers/
 # environment
@@ -97,7 +97,7 @@ NVM_BIN = /Users/nibnalin/.nvm/versions/node/v16.12.0/bin
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # makefile (from `makefile', line 4)
-LDFLAGS := -X 'main.version=v0.2.0-1-g12d1dda'
+LDFLAGS := -X 'main.version=v0.2.0-6-gae35fe6'
 # makefile (from `makefile', line 66)
 TIM_TEST12 = mooneye-gb/timer/tma_write_reloading/
 # default
@@ -108,7 +108,7 @@ define compare
 	-diff "./test/$1actual.jpg" "./test/$1expected.jpg" && echo "$1 OK"
 endef
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.WLJ5tFnSD5/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.gi4so19EIn/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -130,7 +130,7 @@ HOME = /Users/nibnalin
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/nibnalin/Library/Application Support/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
+VSCODE_CODE_CACHE_PATH = /Users/nibnalin/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
 # makefile (from `makefile', line 61)
 TIM_TEST7 = mooneye-gb/timer/tim10_div_trigger/
 # environment
@@ -198,7 +198,7 @@ TMPDIR = /var/folders/9x/2_djf52x1_l5djbjq6l3vl180000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/nibnalin/Library/Application Support/Code/1.70.1-main.sock
+VSCODE_IPC_HOOK = /Users/nibnalin/Library/Application Support/Code/1.70.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -212,7 +212,7 @@ MFLAGS = -sRrqp
 # environment
 NVM_DIR = /Users/nibnalin/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.164384376.164384382
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.166250824.166250830
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # makefile (from `makefile', line 44)
@@ -261,7 +261,7 @@ MAKELEVEL := 0
 LANG = C
 # environment
  
-VSCODE_PID = 93708
+VSCODE_PID = 4519
 # environment
 MY_RUBY_HOME = /Users/nibnalin/.rvm/rubies/ruby-2.6.5
 # variable set hash-table stats:
@@ -273,9 +273,9 @@ MY_RUBY_HOME = /Users/nibnalin/.rvm/rubies/ruby-2.6.5
 
 # Directories
 
-# . (device 16777221, inode 165708325): 19 files, no impossibilities.
+# . (device 16777223, inode 165708325): 21 files, no impossibilities.
 
-# 19 files, no impossibilities in 1 directories.
+# 21 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -474,6 +474,6 @@ timer-test:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Aug 24 22:48:50 2022
+# Finished Make data base on Thu Aug 25 15:43:36 2022
 
  
