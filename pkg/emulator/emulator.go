@@ -43,6 +43,7 @@ func New(romData []byte, romDir string) *Emulator {
 	e.setupCloseHandler()
 
 	e.loadSav()
+	e.loadInp()
 	return e
 }
 
@@ -54,6 +55,7 @@ func (e *Emulator) ResetGBC() {
 	e.GBC.Callbacks = oldCallbacks
 
 	e.loadSav()
+	e.loadInp()
 
 	e.reset = false
 }
@@ -71,7 +73,11 @@ func (e *Emulator) Update() error {
 	}
 
 	defer e.GBC.PanicHandler("update", true)
-	e.GBC.Update()
+	shouldStop := e.GBC.Update()
+	if shouldStop {
+		e.Exit()
+		os.Exit(0)
+	}
 	if e.pause {
 		return nil
 	}

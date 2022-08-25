@@ -45,13 +45,9 @@ func (pad *Joypad) Output() byte {
 }
 
 // Input joypad
-func (j *Joypad) Input() (bool, []bool) {
-	pressed := false
-	handlerOutputs := make([]bool, 8)
-
+func (j *Joypad) Input(pressed bool, handlerOutputs []bool) (bool, []bool) {
 	// A,B,Start,Select
 	for i := 0; i < 4; i++ {
-		handlerOutputs[i] = j.handler[i]()
 		if handlerOutputs[i] {
 			old := j.button[i]
 			j.button[i] = true
@@ -65,7 +61,6 @@ func (j *Joypad) Input() (bool, []bool) {
 
 	// Right, Left, Up, Down
 	for i := 0; i < 4; i++ {
-		handlerOutputs[i+4] = j.handler[i+4]()
 		if handlerOutputs[i+4] {
 			old := j.direction[i]
 			j.direction[i] = true

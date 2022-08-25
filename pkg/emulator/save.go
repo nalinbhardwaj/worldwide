@@ -63,18 +63,16 @@ func (e *Emulator) writeSav() {
 		panic(err)
 	}
 
-	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
+	// inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
 
-	inpfile, err := os.Create(inpname) // TODO: FLAG, change for embedded MIPS to output hash
-	if err != nil {
-		panic(err)
-	}
-	defer inpfile.Close()
+	// inpfile, err := os.Create(inpname) // TODO: FLAG, change for embedded MIPS to output hash
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer inpfile.Close()
 
-	encoder := gob.NewEncoder(inpfile)
-	e.GBC.Inp.ExitFrame = e.GBC.Frame()
-	fmt.Printf("exit frame: %d\n", e.GBC.Inp.ExitFrame)
-	encoder.Encode(e.GBC.Inp)
+	// encoder := gob.NewEncoder(inpfile)
+	// encoder.Encode(e.GBC.PressedInputs)
 }
 
 func (e *Emulator) loadSav() {
@@ -116,4 +114,17 @@ func (e *Emulator) loadSav() {
 		rtcData := savdata[start : start+48]
 		e.GBC.RTC.Sync(rtcData)
 	}
+}
+
+func (e *Emulator) loadInp() {
+	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
+
+	inpfile, err := os.Open(inpname)
+	if err != nil {
+		panic(err)
+	}
+	defer inpfile.Close()
+	decoder := gob.NewDecoder(inpfile)
+
+  decoder.Decode(&e.GBC.Inp)
 }

@@ -1,41 +1,37 @@
 package joypad
 
-import (
-	"github.com/hajimehoshi/ebiten/v2"
-)
-
 var Handler = [8](func() bool){
 	btnA, btnB, btnSelect, btnStart, keyRight, keyLeft, keyUp, keyDown,
 }
 
 func btnA() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyX)
+	return false
 }
 
 func btnB() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyZ)
+	return false
 }
 
 func btnStart() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyEnter)
+	return false
 }
 
 func btnSelect() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyShift)
+	return false
 }
 
 func keyUp() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyUp)
+	return false
 }
 
 func keyDown() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyDown)
+	return false
 }
 
 func keyRight() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyRight)
+	return false
 }
 
 func keyLeft() bool {
-	return ebiten.IsKeyPressed(ebiten.KeyLeft)
+	return false
 }

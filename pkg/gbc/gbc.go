@@ -278,10 +278,13 @@ func (g *GBC) Step() {
 	g.timer.tick(uint32(cycle))
 }
 
-// 1 frame
-func (g *GBC) Update() {
+// 1 frame, returns should stop
+func (g *GBC) Update() bool {
 	frame := g.Frame()
 	if frame%3 == 0 {
+		if frame/3 >= len(g.Inp.PressedInputs) {
+			return true
+		}
 		g.handleJoypad(frame)
 	}
 	framecountertime.UpdateTicker(frame)
@@ -298,6 +301,7 @@ func (g *GBC) Update() {
 	}
 
 	g.Sound.Update()
+	return false
 }
 
 func (g *GBC) PanicHandler(place string, stack bool) {
@@ -347,12 +351,8 @@ func (g *GBC) updateIRQs() {
 func (g *GBC) Draw() []byte { return g.Video.Display().Pix }
 
 func (g *GBC) handleJoypad(frame int) {
-	pressed, handlerOutputs := g.joypad.Input()
-	frameInp := FrameInput{
-		Pressed: pressed,
-		HandlerOutput: handlerOutputs,
-	}
-	g.Inp.PressedInputs = append(g.Inp.PressedInputs, frameInp)
+	relevantInp := g.Inp.PressedInputs[frame/3]
+	pressed, _ := g.joypad.Input(relevantInp.Pressed, relevantInp.HandlerOutput)
 	if pressed {
 		g.IO[IFIO] = util.SetBit8(g.IO[IFIO], 4, true)
 		g.updateIRQs()
