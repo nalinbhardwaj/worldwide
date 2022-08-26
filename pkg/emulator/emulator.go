@@ -1,9 +1,14 @@
 package emulator
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
+	"fmt"
 	"os"
 
+	"github.com/pokemium/worldwide/geth/common"
+	"github.com/pokemium/worldwide/geth/oracle"
 	"github.com/pokemium/worldwide/pkg/emulator/audio"
 	"github.com/pokemium/worldwide/pkg/emulator/joypad"
 	"github.com/pokemium/worldwide/pkg/gbc"
@@ -17,47 +22,58 @@ var (
 type Emulator struct {
 	GBC      *gbc.GBC
 	Rom      []byte
-	RomDir   string
 	pause    bool
 	reset    bool
 	quit     bool
 }
 
-func New(romData []byte, romDir string) *Emulator {
-	g := gbc.New(romData, joypad.Handler, audio.SetStream)
-	audio.Reset(&g.Sound.Enable)
+func loadOracleData() (common.Hash, *gbc.Inputs, []byte) {
+	inputHash := oracle.InputHash()
+	fmt.Println("inputHash:", inputHash)
+	inputPreimageBytes := oracle.Preimage(inputHash)
 
-	e := &Emulator{
-		GBC:    g,
-		Rom:    romData,
-		RomDir: romDir,
-	}
+	savHash := common.BytesToHash(inputPreimageBytes[0:0x20])
+	fmt.Println("savHash:", savHash)
+	inpHash := common.BytesToHash(inputPreimageBytes[0x20:0x40])
+	fmt.Println("inpHash:", inpHash)
+	romHash := common.BytesToHash(inputPreimageBytes[0x40:0x60])
+	fmt.Println("romHash:", romHash)
 
-	e.loadSav()
-	e.loadInp()
-	return e
+	inpdata := oracle.Preimage(inpHash)
+	inpbuf := bytes.NewBuffer(inpdata)
+	decoder := gob.NewDecoder(inpbuf)
+
+	var inputs *gbc.Inputs
+
+  decoder.Decode(&inputs)
+
+	fmt.Printf("inpdata loaded %v\n", inputs)
+
+	rom := oracle.Preimage(romHash)
+	
+	fmt.Printf("romdata loaded %v\n", len(rom))
+	return savHash, inputs, rom
 }
 
-func (e *Emulator) ResetGBC() {
-	e.writeSav()
+func New() *Emulator {
+	_, inputs, rom := loadOracleData()
+	g := gbc.New(rom, joypad.Handler, inputs, audio.SetStream)
+	audio.Reset(&g.Sound.Enable)
+	e := &Emulator{
+		GBC:    g,
+		Rom:    rom,
+	}
+	fmt.Printf("emulator created %v\n", e.GBC.Inp.ExitFrame)
 
-	oldCallbacks := e.GBC.Callbacks
-	e.GBC = gbc.New(e.Rom, joypad.Handler, audio.SetStream)
-	e.GBC.Callbacks = oldCallbacks
+	// e.loadSav(savHash)
+	fmt.Printf("save loaded %v\n", e.GBC.Inp.ExitFrame)
 
-	e.loadSav()
-	e.loadInp()
-
-	e.reset = false
+	return e
 }
 
 func (e *Emulator) Update() error {
 	if e.quit {
 		return errors.New("quit")
-	}
-	if e.reset {
-		e.ResetGBC()
-		return nil
 	}
 	if e.pause {
 		return nil
@@ -100,3 +116,5 @@ func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenH
 func (e *Emulator) Exit() {
 	e.writeSav()
 }
+
+// TODO: remove reset from non MIPS version?

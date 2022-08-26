@@ -10,7 +10,7 @@ import (
 	"unsafe"
 
 	"github.com/pokemium/worldwide/geth/common"
-	"github.com/pokemium/worldwide/geth/core/types"
+	"github.com/pokemium/worldwide/geth/types"
 	"github.com/pokemium/worldwide/geth/crypto"
 )
 
@@ -42,6 +42,14 @@ func Output(output common.Hash, receipts common.Hash) {
 	copy(ret, output.Bytes())
 	rret := byteAt(0x30000824, 0x20)
 	copy(rret, receipts.Bytes())
+	magic := byteAt(0x30000800, 4)
+	copy(magic, []byte{0x13, 0x37, 0xf0, 0x0d})
+	Halt()
+}
+
+func OutputBytes(outputHash common.Hash) {
+	ret := byteAt(0x30000804, 0x20)
+	copy(ret, outputHash.Bytes())
 	magic := byteAt(0x30000800, 4)
 	copy(magic, []byte{0x13, 0x37, 0xf0, 0x0d})
 	Halt()

@@ -3,7 +3,6 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,6 +21,7 @@ func main() {
 }
 
 func RunGame(emu *emulator.Emulator) error {
+	fmt.Printf("Running emu %v\n", emu.GBC.Inp.ExitFrame)
 	for i := 0; i < emu.GBC.Inp.ExitFrame; i++{
 		if err := emu.Update(); err != nil {
 			return err
@@ -32,24 +32,7 @@ func RunGame(emu *emulator.Emulator) error {
 
 // Run program
 func Run() int {
-	flag.Parse()
-
-	romPath := flag.Arg(0)
-	cur, _ := os.Getwd()
-
-	romDir := filepath.Dir(romPath)
-	romData, err := readROM(romPath) // TODO: This becomes part of input state in MIPS and gets hashed
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "ROM Error: %s\n", err)
-		return ExitCodeError
-	}
-
-	emu := emulator.New(romData, romDir)
-
-	os.Chdir(cur)
-	defer func() {
-		os.Chdir(cur)
-	}()
+	emu := emulator.New()
 
 	if err := RunGame(emu); err != nil {
 		if err.Error() == "quit" {

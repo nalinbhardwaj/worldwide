@@ -1,24 +1,16 @@
 package emulator
 
 import (
-	"encoding/gob"
 	"fmt"
-	"os"
-	"path/filepath"
 
+	"github.com/pokemium/worldwide/geth/common"
+	"github.com/pokemium/worldwide/geth/crypto"
+	"github.com/pokemium/worldwide/geth/oracle"
 	"github.com/pokemium/worldwide/pkg/gbc/cart"
 )
 
 // GameBoy save data is SRAM core dump
 func (e *Emulator) writeSav() {
-	savname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".sav")
-
-	savfile, err := os.Create(savname) // TODO: FLAG, change for embedded MIPS to output hash
-	if err != nil {
-		return
-	}
-	defer savfile.Close()
-
 	var buffer []byte
 	switch e.GBC.Cartridge.RAMSize {
 	case cart.RAM_UNUSED:
@@ -58,10 +50,8 @@ func (e *Emulator) writeSav() {
 
 	fmt.Printf("savdata buffer: %x\n", buffer)
 
-	_, err = savfile.Write(buffer)
-	if err != nil {
-		panic(err)
-	}
+	outputHash := crypto.Keccak256Hash(buffer)
+	oracle.OutputBytes(outputHash)
 
 	// inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
 
@@ -75,14 +65,8 @@ func (e *Emulator) writeSav() {
 	// encoder.Encode(e.GBC.PressedInputs)
 }
 
-func (e *Emulator) loadSav() {
-	savname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".sav")
-
-	savdata, err := os.ReadFile(savname) // TODO: FLAG, change for embedded MIPS to input hash, preimage etc
-	if err != nil {
-		return
-	}
-	fmt.Printf("savdata: %x\n", savdata)
+func (e *Emulator) loadSav(savHash common.Hash) {
+	savdata := oracle.Preimage(savHash)
 
 	switch e.GBC.Cartridge.RAMSize {
 	case cart.RAM_UNUSED:
@@ -114,17 +98,4 @@ func (e *Emulator) loadSav() {
 		rtcData := savdata[start : start+48]
 		e.GBC.RTC.Sync(rtcData)
 	}
-}
-
-func (e *Emulator) loadInp() {
-	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
-
-	inpfile, err := os.Open(inpname)
-	if err != nil {
-		panic(err)
-	}
-	defer inpfile.Close()
-	decoder := gob.NewDecoder(inpfile)
-
-  decoder.Decode(&e.GBC.Inp)
 }

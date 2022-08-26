@@ -209,6 +209,10 @@ func Output(output common.Hash, receipts common.Hash) {
 	}
 }
 
+func OutputBytes(output common.Hash) {
+	fmt.Println("OutputBytes", output)
+}
+
 func check(err error) {
 	if err != nil {
 		log.Fatal(err)

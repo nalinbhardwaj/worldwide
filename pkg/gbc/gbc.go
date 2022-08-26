@@ -226,7 +226,7 @@ func (g *GBC) resetRegister() {
 	g.Reg.PC, g.Reg.SP = 0x0100, 0xfffe
 }
 
-func New(romData []byte, j [8](func() bool), setAudioStream func([]byte)) *GBC {
+func New(romData []byte, j [8](func() bool), inputs *Inputs, setAudioStream func([]byte)) *GBC {
 	c := cart.New(romData)
 	g := &GBC{
 		Cartridge: c,
@@ -234,7 +234,7 @@ func New(romData []byte, j [8](func() bool), setAudioStream func([]byte)) *GBC {
 		joypad:    joypad.New(j),
 		RTC:       rtc.New(c.HasRTC()),
 		Sound:     apu.New(true, setAudioStream),
-		Inp:  		 NewInp(),
+		Inp:  		 inputs,
 	}
 
 	// init graphics
@@ -281,6 +281,7 @@ func (g *GBC) Step() {
 // 1 frame, returns should stop
 func (g *GBC) Update() bool {
 	frame := g.Frame()
+	fmt.Printf("frame: %d\n", frame)
 	if frame%3 == 0 {
 		if frame/3 >= len(g.Inp.PressedInputs) {
 			return true
