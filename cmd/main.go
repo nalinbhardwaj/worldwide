@@ -12,34 +12,10 @@ import (
 	"github.com/pokemium/worldwide/pkg/emulator"
 )
 
-var version string
-
-const (
-	title = "worldwide"
-)
-
 const (
 	ExitCodeOK int = iota
 	ExitCodeError
 )
-
-func init() {
-	if version == "" {
-		version = "Develop"
-	}
-
-	flag.Usage = func() {
-		usage := fmt.Sprintf(`Usage:
-    %s [arg] [input]
-    e.g. %s -p 8888 ./PM_PRISM.gbc
-Input: ROM filepath, ***.gb or ***.gbc
-Arguments: 
-`, title, title)
-		fmt.Println(Version())
-		fmt.Fprint(os.Stderr, usage)
-		flag.PrintDefaults()
-	}
-}
 
 func main() {
 	os.Exit(Run())
@@ -56,16 +32,7 @@ func RunGame(emu *emulator.Emulator) error {
 
 // Run program
 func Run() int {
-	var (
-		showVersion = flag.Bool("v", false, "show version")
-	)
-
 	flag.Parse()
-
-	if *showVersion {
-		fmt.Println(Version())
-		return ExitCodeOK
-	}
 
 	romPath := flag.Arg(0)
 	cur, _ := os.Getwd()
@@ -93,10 +60,6 @@ func Run() int {
 	}
 	emu.Exit()
 	return ExitCodeOK
-}
-
-func Version() string {
-	return fmt.Sprintf("%s: %s", title, version)
 }
 
 func readROM(path string) ([]byte, error) {

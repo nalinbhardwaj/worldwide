@@ -1,11 +1,9 @@
 NAME := worldwide
 BINDIR := ./build
-VERSION := $(shell git describe --tags 2>/dev/null)
-LDFLAGS := -X 'main.version=$(VERSION)'
 
 .PHONY: build
 build:
-	@go build -tags macos -o $(BINDIR)/darwin-amd64/$(NAME) -ldflags "$(LDFLAGS)" ./cmd/
+	@go build -tags macos -o $(BINDIR)/darwin-amd64/$(NAME) ./cmd/
 
 .PHONY: ci
 ci:
@@ -13,11 +11,11 @@ ci:
 
 .PHONY: build-linux
 build-linux:
-	@GOOS=linux GOARCH=amd64 go build -tags windows -o $(BINDIR)/linux-amd64/$(NAME) -ldflags "$(LDFLAGS)" ./cmd/
+	@GOOS=linux GOARCH=amd64 go build -tags windows -o $(BINDIR)/linux-amd64/$(NAME) ./cmd/
 
 .PHONY: build-windows
 build-windows:
-	@GOOS=windows GOARCH=amd64 go build -tags windows -o $(BINDIR)/windows-amd64/$(NAME).exe -ldflags "$(LDFLAGS)" ./cmd/
+	@GOOS=windows GOARCH=amd64 go build -tags windows -o $(BINDIR)/windows-amd64/$(NAME).exe ./cmd/
 
 .PHONY: clean
 clean:
