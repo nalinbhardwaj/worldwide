@@ -106,7 +106,7 @@ func (e *Emulator) Draw() {
 	}
 
 	defer e.GBC.PanicHandler("draw", true)
-	cache = e.GBC.Draw()
+	// cache = e.GBC.Draw()
 }
 
 func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
