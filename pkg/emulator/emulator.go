@@ -3,8 +3,6 @@ package emulator
 import (
 	"errors"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/pokemium/worldwide/pkg/emulator/audio"
 	"github.com/pokemium/worldwide/pkg/emulator/joypad"
@@ -34,7 +32,6 @@ func New(romData []byte, romDir string) *Emulator {
 		Rom:    romData,
 		RomDir: romDir,
 	}
-	e.setupCloseHandler()
 
 	e.loadSav()
 	e.loadInp()
@@ -102,14 +99,4 @@ func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenH
 
 func (e *Emulator) Exit() {
 	e.writeSav()
-}
-
-func (e *Emulator) setupCloseHandler() { // TODO: BIG FLAG, need to delete this from MIPS
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		e.Exit()
-		os.Exit(0)
-	}()
 }
