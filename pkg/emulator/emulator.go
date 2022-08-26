@@ -2,12 +2,10 @@ package emulator
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/pokemium/worldwide/pkg/emulator/audio"
 	"github.com/pokemium/worldwide/pkg/emulator/joypad"
 	"github.com/pokemium/worldwide/pkg/gbc"
@@ -30,10 +28,6 @@ type Emulator struct {
 func New(romData []byte, romDir string) *Emulator {
 	g := gbc.New(romData, joypad.Handler, audio.SetStream)
 	audio.Reset(&g.Sound.Enable)
-
-	ebiten.SetWindowResizable(true)
-	ebiten.SetWindowTitle("60fps")
-	ebiten.SetWindowSize(160*2, 144*2)
 
 	e := &Emulator{
 		GBC:    g,
@@ -87,22 +81,19 @@ func (e *Emulator) Update() error {
 	select {
 	case <-framecountertime.Ticker:
 		e.GBC.RTC.IncrementSecond()
-		ebiten.SetWindowTitle(fmt.Sprintf("%dfps", int(ebiten.CurrentTPS())))
 	default:
 	}
 
 	return nil
 }
 
-func (e *Emulator) Draw(screen *ebiten.Image) {
+func (e *Emulator) Draw() {
 	if e.pause {
-		screen.ReplacePixels(cache)
 		return
 	}
 
 	defer e.GBC.PanicHandler("draw", true)
 	cache = e.GBC.Draw()
-	screen.ReplacePixels(cache)
 }
 
 func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

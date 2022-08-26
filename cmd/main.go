@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/pokemium/worldwide/pkg/emulator"
 )
 
@@ -46,6 +45,15 @@ func main() {
 	os.Exit(Run())
 }
 
+func RunGame(emu *emulator.Emulator) error {
+	for i := 0; i < emu.GBC.Inp.ExitFrame; i++{
+		if err := emu.Update(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Run program
 func Run() int {
 	var (
@@ -76,7 +84,7 @@ func Run() int {
 		os.Chdir(cur)
 	}()
 
-	if err := ebiten.RunGame(emu); err != nil {
+	if err := RunGame(emu); err != nil {
 		if err.Error() == "quit" {
 			emu.Exit()
 			return ExitCodeOK
