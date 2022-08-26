@@ -46,25 +46,9 @@ func New(romData []byte, romDir string) *Emulator {
 	return e
 }
 
-func (e *Emulator) ResetGBC() {
-	e.writeSav()
-
-	oldCallbacks := e.GBC.Callbacks
-	e.GBC = gbc.New(e.Rom, joypad.Handler, audio.SetStream)
-	e.GBC.Callbacks = oldCallbacks
-
-	e.loadSav()
-
-	e.reset = false
-}
-
 func (e *Emulator) Update() error {
 	if e.quit {
 		return errors.New("quit")
-	}
-	if e.reset {
-		e.ResetGBC()
-		return nil
 	}
 	if e.pause {
 		return nil
