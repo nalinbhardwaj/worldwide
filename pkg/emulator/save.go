@@ -12,13 +12,15 @@ import (
 
 // GameBoy save data is SRAM core dump
 func (e *Emulator) writeSav(currentTxNumber int) {
-	savname := filepath.Join(e.RomDir, strconv.Itoa(currentTxNumber), "-"+e.GBC.Cartridge.Title+".sav")
+	savname := filepath.Join(e.RomDir, strconv.Itoa(currentTxNumber)+"-"+e.GBC.Cartridge.Title+".sav")
 
 	savfile, err := os.Create(savname) // TODO: FLAG, change for embedded MIPS to output hash
 	if err != nil {
-		return
+		panic(err)
 	}
 	defer savfile.Close()
+
+	fmt.Printf("writing file: %s\n", savname)
 
 	var buffer []byte
 	switch e.GBC.Cartridge.RAMSize {

@@ -62,7 +62,7 @@ func (e *Emulator) ResetGBC() {
 var currentTxNumber = 0
 var currentTxIsDone = false
 var currentTxInputCounter = 0
-const TXBATCHSIZE = 10
+const TXBATCHSIZE = 2
 
 func (e *Emulator) loadCurrentTx() bool {
 	didRead := e.loadInp(currentTxNumber + 1)
@@ -102,7 +102,7 @@ func (e *Emulator) Update() error {
 		fmt.Println("current tx is done")
 		currentTxIsDone = true
 	}
-	if currentTxIsDone && currentTxNumber % TXBATCHSIZE == 0 {
+	if currentTxIsDone && currentTxNumber % TXBATCHSIZE == 0 && currentTxNumber > 0 {
 		// Dump sav and restart
 		fmt.Println("current tx is done, restarting")
 		e.ResetGBC()
