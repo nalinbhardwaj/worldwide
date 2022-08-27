@@ -51,7 +51,7 @@ func loadOracleData() (common.Hash, *gbc.Inputs, []byte) {
 }
 
 func New() *Emulator {
-	_, inputs, rom := loadOracleData()
+	savHash, inputs, rom := loadOracleData()
 	g := gbc.New(rom, joypad.Handler, inputs, audio.SetStream)
 	audio.Reset(&g.Sound.Enable)
 	e := &Emulator{
@@ -60,7 +60,7 @@ func New() *Emulator {
 	}
 	fmt.Printf("emulator created %v\n", len(e.GBC.Inp.PressedInputs))
 
-	// e.loadSav(savHash)
+	e.loadSav(savHash)
 	fmt.Printf("save loaded %v\n", len(e.GBC.Inp.PressedInputs))
 
 	return e
