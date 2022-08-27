@@ -1,17 +1,19 @@
 package emulator
 
 import (
-	"encoding/gob"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/pokemium/worldwide/pkg/gbc/cart"
 )
 
 // GameBoy save data is SRAM core dump
-func (e *Emulator) writeSav() {
-	savname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".sav")
+func (e *Emulator) writeSav(currentTxNumber int) {
+	savname := filepath.Join(e.RomDir, strconv.Itoa(currentTxNumber), "-"+e.GBC.Cartridge.Title+".sav")
 
 	savfile, err := os.Create(savname) // TODO: FLAG, change for embedded MIPS to output hash
 	if err != nil {
@@ -63,7 +65,7 @@ func (e *Emulator) writeSav() {
 		panic(err)
 	}
 
-	// inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
+	// inpname := filepath.Join(e.RomDir, strconv.Itoa(currentTxNumber), "-"+e.GBC.Cartridge.Title+".inp")
 
 	// inpfile, err := os.Create(inpname) // TODO: FLAG, change for embedded MIPS to output hash
 	// if err != nil {
@@ -117,14 +119,8 @@ func (e *Emulator) loadSav() {
 }
 
 func (e *Emulator) loadInp() {
-	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp")
+	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp.json")
 
-	inpfile, err := os.Open(inpname)
-	if err != nil {
-		panic(err)
-	}
-	defer inpfile.Close()
-	decoder := gob.NewDecoder(inpfile)
-
-  decoder.Decode(&e.GBC.Inp)
+	file, _ := ioutil.ReadFile(inpname)
+	_ = json.Unmarshal([]byte(file), &e.GBC.Inp)
 }

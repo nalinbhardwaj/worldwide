@@ -76,13 +76,13 @@ type FrameInput struct {
 }
 
 type Inputs struct {
-	ExitFrame int
+	TxNumber int
 	PressedInputs []FrameInput
 }
 
 func NewInp() *Inputs {
 	return &Inputs{
-		ExitFrame: -1,
+		TxNumber: -1,
 		PressedInputs: make([]FrameInput, 0),
 	}
 }

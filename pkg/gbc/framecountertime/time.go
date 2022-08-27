@@ -11,3 +11,7 @@ func UpdateTicker(frame int) {
 		UnixNow += 1
 	}
 }
+
+func SetUnixNow(unixNow int64) {
+	UnixNow = unixNow
+}

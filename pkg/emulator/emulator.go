@@ -43,24 +43,41 @@ func New(romData []byte, romDir string) *Emulator {
 	e.setupCloseHandler()
 
 	e.loadSav()
-	e.loadInp()
 	return e
 }
 
 func (e *Emulator) ResetGBC() {
-	e.writeSav()
+	e.writeSav(currentTxNumber)
 
 	oldCallbacks := e.GBC.Callbacks
 	e.GBC = gbc.New(e.Rom, joypad.Handler, audio.SetStream)
 	e.GBC.Callbacks = oldCallbacks
 
 	e.loadSav()
-	e.loadInp()
+	framecountertime.SetUnixNow(1651411507)
 
 	e.reset = false
 }
 
+var currentTxNumber = 0
+var currentTxIsDone = false
+
+func (e *Emulator) loadCurrentTx() bool {
+	e.loadInp()
+	if e.GBC.Inp.TxNumber == currentTxNumber + 1 {
+		currentTxNumber = e.GBC.Inp.TxNumber
+		currentTxIsDone = false
+		return false
+	}
+	return true
+}
+
 func (e *Emulator) Update() error {
+	noNewTx := e.loadCurrentTx()
+	if noNewTx && currentTxIsDone {
+		// Paused
+		return nil
+	}
 	if e.quit {
 		return errors.New("quit")
 	}
@@ -73,10 +90,13 @@ func (e *Emulator) Update() error {
 	}
 
 	defer e.GBC.PanicHandler("update", true)
-	shouldStop := e.GBC.Update()
-	if shouldStop {
-		e.Exit()
-		os.Exit(0)
+	currentTxStatus := e.GBC.Update()
+	if currentTxStatus {
+		currentTxIsDone = true
+	}
+	if currentTxIsDone && currentTxNumber % 60 == 0 {
+		// Dump sav and restart
+		e.ResetGBC()
 	}
 	if e.pause {
 		return nil
@@ -110,7 +130,7 @@ func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenH
 }
 
 func (e *Emulator) Exit() {
-	e.writeSav()
+	e.writeSav(currentTxNumber)
 }
 
 func (e *Emulator) setupCloseHandler() { // TODO: BIG FLAG, need to delete this from MIPS
