@@ -279,13 +279,13 @@ func (g *GBC) Step() {
 }
 
 // 1 frame, returns should stop
-func (g *GBC) Update() bool {
+func (g *GBC) Update(currentTxInputCounter int) bool {
 	frame := g.Frame()
 	if frame%3 == 0 {
-		if frame/3 >= len(g.Inp.PressedInputs) {
+		shouldStop := g.handleJoypad(currentTxInputCounter)
+		if shouldStop {
 			return true
 		}
-		g.handleJoypad(frame)
 	}
 	framecountertime.UpdateTicker(frame)
 
@@ -350,13 +350,17 @@ func (g *GBC) updateIRQs() {
 
 func (g *GBC) Draw() []byte { return g.Video.Display().Pix }
 
-func (g *GBC) handleJoypad(frame int) {
-	relevantInp := g.Inp.PressedInputs[frame/3]
+func (g *GBC) handleJoypad(currentTxInputCounter int) bool {
+	if currentTxInputCounter/3 >= len(g.Inp.PressedInputs) {
+		return true
+	}
+	relevantInp := g.Inp.PressedInputs[currentTxInputCounter/3]
 	pressed, _ := g.joypad.Input(relevantInp.Pressed, relevantInp.HandlerOutput)
 	if pressed {
 		g.IO[IFIO] = util.SetBit8(g.IO[IFIO], 4, true)
 		g.updateIRQs()
 	}
+	return false
 }
 
 func (g *GBC) Frame() int { return g.Video.FrameCounter }

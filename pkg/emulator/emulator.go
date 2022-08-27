@@ -61,22 +61,28 @@ func (e *Emulator) ResetGBC() {
 
 var currentTxNumber = 0
 var currentTxIsDone = false
+var currentTxInputCounter = 0
+const TXBATCHSIZE = 10
 
 func (e *Emulator) loadCurrentTx() bool {
-	e.loadInp()
-	if e.GBC.Inp.TxNumber == currentTxNumber + 1 {
+	didRead := e.loadInp(currentTxNumber + 1)
+	if didRead {
 		currentTxNumber = e.GBC.Inp.TxNumber
 		currentTxIsDone = false
+		currentTxInputCounter = 0
+		fmt.Println("new tx", e.GBC.Inp.TxNumber, len(e.GBC.Inp.PressedInputs))
 		return false
 	}
 	return true
 }
 
 func (e *Emulator) Update() error {
-	noNewTx := e.loadCurrentTx()
-	if noNewTx && currentTxIsDone {
-		// Paused
-		return nil
+	if currentTxIsDone {
+		noNewTx := e.loadCurrentTx()
+		if noNewTx {
+			// Paused
+			return nil
+		}
 	}
 	if e.quit {
 		return errors.New("quit")
@@ -90,12 +96,15 @@ func (e *Emulator) Update() error {
 	}
 
 	defer e.GBC.PanicHandler("update", true)
-	currentTxStatus := e.GBC.Update()
+	currentTxStatus := e.GBC.Update(currentTxInputCounter)
+	currentTxInputCounter++
 	if currentTxStatus {
+		fmt.Println("current tx is done")
 		currentTxIsDone = true
 	}
-	if currentTxIsDone && currentTxNumber % 60 == 0 {
+	if currentTxIsDone && currentTxNumber % TXBATCHSIZE == 0 {
 		// Dump sav and restart
+		fmt.Println("current tx is done, restarting")
 		e.ResetGBC()
 	}
 	if e.pause {

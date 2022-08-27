@@ -3,7 +3,6 @@ package emulator
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -118,9 +117,13 @@ func (e *Emulator) loadSav() {
 	}
 }
 
-func (e *Emulator) loadInp() {
-	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+".inp.json")
+func (e *Emulator) loadInp(currentTxNumber int) bool {
+	inpname := filepath.Join(e.RomDir, e.GBC.Cartridge.Title+"-"+strconv.Itoa(currentTxNumber)+".inp.json")
 
-	file, _ := ioutil.ReadFile(inpname)
+	file, err := os.ReadFile(inpname)
+	if err != nil {
+		return false
+	}
 	_ = json.Unmarshal([]byte(file), &e.GBC.Inp)
+	return true
 }
