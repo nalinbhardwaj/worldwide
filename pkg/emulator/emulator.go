@@ -11,7 +11,6 @@ import (
 	"github.com/pokemium/worldwide/pkg/emulator/audio"
 	"github.com/pokemium/worldwide/pkg/emulator/joypad"
 	"github.com/pokemium/worldwide/pkg/gbc"
-	"github.com/pokemium/worldwide/pkg/gbc/framecountertime"
 )
 
 var (
@@ -68,8 +67,10 @@ func New() *Emulator {
 }
 
 var inputCounter = 0
+var frameCounter = -1
 
 func (e *Emulator) Update() error {
+	frameCounter++
 	if e.quit {
 		return errors.New("quit")
 	}
@@ -90,10 +91,8 @@ func (e *Emulator) Update() error {
 
 	audio.Play()
 
-	select {
-	case <-framecountertime.Ticker:
+	if frameCounter % 60 == 0 {
 		e.GBC.RTC.IncrementSecond()
-	default:
 	}
 
 	return nil
@@ -105,7 +104,7 @@ func (e *Emulator) Draw() {
 	}
 
 	defer e.GBC.PanicHandler("draw", true)
-	// cache = e.GBC.Draw()
+	cache = e.GBC.Draw()
 }
 
 func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
