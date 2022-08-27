@@ -47,7 +47,7 @@ func New(romData []byte, romDir string) *Emulator {
 }
 
 func (e *Emulator) ResetGBC() {
-	e.writeSav(currentTxNumber)
+	e.writeSav(currentTxNumber - TXBATCHSIZE, currentTxNumber, allPressedInputs)
 
 	oldCallbacks := e.GBC.Callbacks
 	e.GBC = gbc.New(e.Rom, joypad.Handler, audio.SetStream)
@@ -57,12 +57,14 @@ func (e *Emulator) ResetGBC() {
 	framecountertime.SetUnixNow(1651411507)
 
 	e.reset = false
+	allPressedInputs = make([]gbc.FrameInput, 0)
 }
 
 var currentTxNumber = 0
 var currentTxIsDone = false
 var currentTxInputCounter = 0
-const TXBATCHSIZE = 2
+const TXBATCHSIZE = 1
+var allPressedInputs = make([]gbc.FrameInput, 0)
 
 func (e *Emulator) loadCurrentTx() bool {
 	didRead := e.loadInp(currentTxNumber + 1)
@@ -71,6 +73,7 @@ func (e *Emulator) loadCurrentTx() bool {
 		currentTxIsDone = false
 		currentTxInputCounter = 0
 		fmt.Println("new tx", e.GBC.Inp.TxNumber, len(e.GBC.Inp.PressedInputs))
+		allPressedInputs = append(allPressedInputs, e.GBC.Inp.PressedInputs...)
 		return false
 	}
 	return true
@@ -139,7 +142,7 @@ func (e *Emulator) Layout(outsideWidth, outsideHeight int) (screenWidth, screenH
 }
 
 func (e *Emulator) Exit() {
-	e.writeSav(currentTxNumber)
+	e.writeSav(currentTxNumber - TXBATCHSIZE, currentTxNumber, allPressedInputs)
 }
 
 func (e *Emulator) setupCloseHandler() { // TODO: BIG FLAG, need to delete this from MIPS

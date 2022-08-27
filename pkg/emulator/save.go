@@ -1,18 +1,67 @@
 package emulator
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 
+	"github.com/pokemium/worldwide/pkg/gbc"
 	"github.com/pokemium/worldwide/pkg/gbc/cart"
 )
 
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+					return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+					return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+					return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+					return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
+}
+
+func Shellout(command string) (error, string, string) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd := exec.Command("bash", "-c", command)
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	return err, stdout.String(), stderr.String()
+}
+
+
 // GameBoy save data is SRAM core dump
-func (e *Emulator) writeSav(currentTxNumber int) {
-	savname := filepath.Join(e.RomDir, strconv.Itoa(currentTxNumber)+"-"+e.GBC.Cartridge.Title+".sav")
+func (e *Emulator) writeSav(prevTxNumber int, currentTxNumber int, allPressedInputs []gbc.FrameInput) {
+	// Copy to cannon base folder
+	os.MkdirAll("cannon/"+strconv.Itoa(currentTxNumber)+"/", os.ModePerm)
+
+	if prevTxNumber > 0 {
+		copy("cannon/"+strconv.Itoa(prevTxNumber)+"/"+e.GBC.Cartridge.Title+".sav", "cannon/"+strconv.Itoa(currentTxNumber)+"/"+e.GBC.Cartridge.Title+"-previous.sav")
+	}
+	copy("pokemon.gbc", "cannon/"+strconv.Itoa(currentTxNumber)+"/"+e.GBC.Cartridge.Title+".gbc")
+
+	savname := "cannon/"+strconv.Itoa(currentTxNumber)+"/"+e.GBC.Cartridge.Title+".sav"
 
 	savfile, err := os.Create(savname) // TODO: FLAG, change for embedded MIPS to output hash
 	if err != nil {
@@ -64,6 +113,41 @@ func (e *Emulator) writeSav(currentTxNumber int) {
 	_, err = savfile.Write(buffer)
 	if err != nil {
 		panic(err)
+	}
+
+	inpname :=  "cannon/"+strconv.Itoa(currentTxNumber)+"/"+e.GBC.Cartridge.Title+".inp.json"
+
+	inpfile, err := os.Create(inpname) // TODO: FLAG, change for embedded MIPS to output hash
+	if err != nil {
+		panic(err)
+	}
+	defer inpfile.Close()
+
+	newInp := gbc.Inputs{
+		TxNumber: 0,
+		PressedInputs:   allPressedInputs,
+	}
+
+	fmt.Printf("written pressedinputs: %v\n", len(newInp.PressedInputs))
+	inpdata, _ := json.MarshalIndent(newInp, "", " ")
+
+	_, err = inpfile.Write(inpdata)
+	if err != nil {
+		panic(err)
+	}
+
+	// exec cannon with these inputs
+	if prevTxNumber > 0 {
+		go func() {
+			err, out, errout := Shellout("BASEDIR="+"/Users/nibnalin/Documents/worldwide-simul/cannon/"+strconv.Itoa(currentTxNumber)+" /Users/nibnalin/Documents/cannon/mipsevm/mipsevm")
+			if err != nil {
+					log.Printf("error: %v\n", err)
+			}
+			fmt.Println("--- stdout ---")
+			fmt.Println(out)
+			fmt.Println("--- stderr ---")
+			fmt.Println(errout)
+		}()
 	}
 
 	// inpname := filepath.Join(e.RomDir, strconv.Itoa(currentTxNumber), "-"+e.GBC.Cartridge.Title+".inp")
