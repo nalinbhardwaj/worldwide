@@ -21,13 +21,12 @@ func main() {
 }
 
 func RunGame(emu *emulator.Emulator) error {
-	fmt.Printf("Running emu %v\n", emu.GBC.Inp.ExitFrame)
-	for i := 0; i < emu.GBC.Inp.ExitFrame; i++{
+	fmt.Printf("Running emu %v\n", len(emu.GBC.Inp.PressedInputs))
+	for {
 		if err := emu.Update(); err != nil {
 			return err
 		}
 	}
-	return nil
 }
 
 // Run program

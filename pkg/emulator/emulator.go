@@ -1,8 +1,7 @@
 package emulator
 
 import (
-	"bytes"
-	"encoding/gob"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -40,12 +39,9 @@ func loadOracleData() (common.Hash, *gbc.Inputs, []byte) {
 	fmt.Println("romHash:", romHash)
 
 	inpdata := oracle.Preimage(inpHash)
-	inpbuf := bytes.NewBuffer(inpdata)
-	decoder := gob.NewDecoder(inpbuf)
-
 	var inputs *gbc.Inputs
 
-  decoder.Decode(&inputs)
+	json.Unmarshal(inpdata, &inputs)
 
 	fmt.Printf("inpdata loaded %v\n", inputs)
 
@@ -63,13 +59,15 @@ func New() *Emulator {
 		GBC:    g,
 		Rom:    rom,
 	}
-	fmt.Printf("emulator created %v\n", e.GBC.Inp.ExitFrame)
+	fmt.Printf("emulator created %v\n", len(e.GBC.Inp.PressedInputs))
 
 	// e.loadSav(savHash)
-	fmt.Printf("save loaded %v\n", e.GBC.Inp.ExitFrame)
+	fmt.Printf("save loaded %v\n", len(e.GBC.Inp.PressedInputs))
 
 	return e
 }
+
+var inputCounter = 0
 
 func (e *Emulator) Update() error {
 	if e.quit {
@@ -80,7 +78,8 @@ func (e *Emulator) Update() error {
 	}
 
 	defer e.GBC.PanicHandler("update", true)
-	shouldStop := e.GBC.Update()
+	shouldStop := e.GBC.Update(inputCounter)
+	inputCounter++
 	if shouldStop {
 		e.Exit()
 		os.Exit(0)
